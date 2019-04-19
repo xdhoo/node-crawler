@@ -1,69 +1,53 @@
-const http = require('http')
-const https = require('https')
-const fs = require('fs')
-const cheerio = require('cheerio')
-const request = require('request')
-var iconv = require('iconv-lite');
+const express = require('express');
+const app = express();
+const fs = require('fs');
+const topList = require('./api/top-list')
+const playList = require('./api/play-list')
+const artist = require('./api/artist')
 
-const url = "https://music.163.com/discover/toplist"; 
-function fetchPage(url) {
-  startRequest(url)
-}
+app.get('/topList', (req, res) => {
 
-function startRequest(url) {
-  head={'User-Agent':'Mozilla/5.0'}
-  https.headers = head
-  request(url,(err, res, body) => {
-    let $ = cheerio.load(body);
-    fs.appendFile('./data/html.txt', body, 'utf-8', err => {
-      console.log(err)
+  if(req.query.id) {
+    topList.getTopListById(req.query.id).then(list => {
+      res.send(list);
+      res.end()
     })
-  })
-  // https.get(url, (res) => {
-  //   let chunks = []
-    
-  //   res.on('data', (chunk) => {
-  //     chunks.push(chunk);
-  //   })
-    
-  //   res.on('end', () => {
-  //     let titles = [];
-  //     let html = iconv.decode(Buffer.concat(chunks), 'utf-8');
-  //     fs.appendFile('./data/html.txt', html, 'utf-8', err => {
-  //       console.log(err)
-  //     })
-  //     let $ = cheerio.load(html, {decodeEntities: false});
-  //     $('ul.f-hide li').each(function (idx, element) {
-  //       var $element = $(element);
-  //       titles.push({
-  //         title: $element.text()
-  //       })
-  //     })  
-  //     // fs.appendFile('./data/html.txt', html, 'utf-8', err => {
-  //     //   console.log(err)
-  //     // })
-  //     // fs.appendFile('./data/topList.txt', $('ul.f-hide').find('a'), 'utf-8', err => {
-  //     //   console.log(err)
-  //     // })
-  //     // savedImage($, news_title)
-  //     console.log(titles)
-  //   })
-  // })
-}
+  } else {
+    topList.getTopList().then((list) => { 
+      res.send(list);
+      res.end();
+    })
+  }  
+})
 
-function savedContent($) {
-  console.log($)
-  $('li a').each((item, index) => {
-    console.log(item)
-    let x = $(this).text();
-    let y = x.substring(0, 2).trim();
-    if (!y) {
-      x = x + '\n';
-      fs.appendFile('./data/topList.txt', x, 'utf-8', err => {
-        console.log(err)
-      })
-    }
-  })
-}
 
-fetchPage(url)
+app.get('/playList', (req, res) => {
+  if(req.query.id) {
+    playList.getPlayListById(req.query.id).then(list => {
+      res.send(list);
+      res.end;
+    })
+  } else {
+    playList.getPlayList().then((list) => {
+      res.send(list);
+      res.end();
+    })
+  }
+})
+
+app.get('/artist', (req, res) => {
+  if(req.query.id) {
+    artist.getArtistById(req.query.id).then(artist => {
+      res.send(artist);
+      res.end();
+    })
+  } else {
+    artist.getArtists().then(artists => {
+      res.send(artists)
+      res.end();
+    })
+  }  
+})
+const server = app.listen(7777, () => {
+  console.log('Server Success...')
+})
