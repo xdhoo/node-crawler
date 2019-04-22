@@ -16,13 +16,7 @@ getTopList = () => {
       }
       let list = [];
       let $ = cheerio.load(body);
-      $('ul.f-hide li a').each((idx, element) => {
-        let $element = $(element);
-        list.push({
-          id: $element.attr('href').match(/\d+/g)[0],
-          title: $element.text()
-        })
-      })  
+      list = $('textarea#song-list-pre-data').text()
       resolved(list)
     })
   }) 

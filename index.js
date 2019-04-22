@@ -5,6 +5,14 @@ const topList = require('./api/top-list')
 const playList = require('./api/play-list')
 const artist = require('./api/artist')
 
+app.all('*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", '*');
+  res.header('Access-Control-Allow-Methods', 'POST, GET');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+next();
+});
+
 app.get('/topList', (req, res) => {
 
   if(req.query.id) {
