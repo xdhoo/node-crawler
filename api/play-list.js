@@ -43,17 +43,25 @@ getPlayListById = (id) => {
       if(err) {
         rejected(err)
       }
-      let list = [];
-      let $ = cheerio.load(body);
-      fs.appendFile('./data/body.txt', $('textarea#song-list-pre-data').html(), 'utf-8', (err)=>{})
-  
-      // list = new Buffer($('textarea#song-list-pre-data').text(), 'base64').toString()
+      let playlist = {id};
+      let $ = cheerio.load(body,{decodeEntities: false});
+      let $author = $('.user')
+      playlist.title = $('.tit').text();
+      playlist.image = $('.u-cover-dj img').attr('src')
+      playlist.author = {
+        id: $author.find('.face').attr('href').match(/\d+/g)[0],
+        name: $author.find('.name a').text(),
+        createTime: $author.find('.time').text(),
+        image: $author.find('img').attr('src')
+      }
+      playlist.tags = []
+      $('.tags a.u-tag i').each((idx, element) => {
+        playlist.tags.push($(element).text())
+      })
+      playlist.description = $('p#album-desc-more').html()
+      playlist.playCount = $('#play-count').text()
 
-      let data = new Buffer($('textarea#song-list-pre-data').text().replace(/\n/g,''), 'base64')
-      let lists = iconv.decode(data, 'utf-8')
-      fs.appendFile('./data/html.txt', lists, 'utf-8', (err)=>{})
-
-      resolved(list)
+      resolved(playlist)
     })
   }) 
 }
