@@ -14,10 +14,27 @@ getTopList = () => {
       if(err) {
         rejected(err)
       }
-      let list = [];
+      let topList = []
       let $ = cheerio.load(body);
-      list = $('textarea#song-list-pre-data').text()
-      resolved(list)
+      $('#toplist h2').each((idx, element) => {
+        topList.push({
+          name: $(element).text()
+        })
+      })
+      $('#toplist ul').each((idx, element) => {
+        let _list = []
+        $(element).find('li').each((_idx, _element) => {
+          _list.push({
+            id: $(_element).find('a').attr('href').match(/\d+/g)[0],
+            image: $(_element).find('img').attr('src'),
+            name: $(_element).find('p.name').text(),
+            update: $(_element).find('p.s-fc4').text()
+          })
+        })
+        topList[idx].list = _list
+      })
+      // topList.list = $('textarea#song-list-pre-data').text()
+      resolved(topList)
     })
   }) 
 }
@@ -34,18 +51,12 @@ getTopListById = (id) => {
       }
       let $ = cheerio.load(body)
       let list = []
-      $('ul.f-hide li a').each((idx, element) => {
-        let $element = $(element);
-        list.push({
-          id: $element.attr('href').match(/\d+/g)[0],
-          title: $element.text()
-        })
-      })
+      list = $('textarea#song-list-pre-data').text()
       resolved(list)
     })
   })
 }
-module.exports =  {
+module.exports = {
   getTopList,
   getTopListById
 }
