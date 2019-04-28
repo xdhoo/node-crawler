@@ -43,7 +43,7 @@ app.get('/playList', (req, res) => {
   }
 })
 
-app.get('/artist', (req, res) => {
+app.get('/artists', (req, res) => {
   if(req.query.id) {
     artist.getArtistById(req.query.id).then(artist => {
       res.send(artist);

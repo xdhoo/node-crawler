@@ -12,11 +12,29 @@ getArtists = () => {
       if(err) {
         rejected(err)
       }
-      let artists = [];
+      let artists = {
+        nav: [],
+        artists: []
+      };
       let $ = cheerio.load(body);
+
+      $('#singer-cat-nav div.blk').each((idx, element) => {
+        let _nav = {
+          title: $(element).find('h2').text(),
+          items: []
+        };
+        $(element).find('ul li a').each((_idx, _element) => {
+          _nav.items.push({
+            id: $(_element).attr('data-cat'),
+            name: $(_element).text()
+          })
+        })
+        artists.nav.push(_nav);       
+      })
+
       $('div.m-sgerlist ul li').each((idx, element) => {
         let $element = $(element);
-        artists.push({
+        artists.artists.push({
           img: $element.find('img').attr('src'),
           id: $element.find('a.nm').attr('href').match(/\d+/g)[0],
           artist: $element.find('a.nm').text(),
