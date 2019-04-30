@@ -49,25 +49,21 @@ getArtists = () => {
 getArtistById = (id) => {
   return new Promise((resolved, rejected) => {
     request({
-      url: config.BASE_URL + '/discover/artist?id=' + id,
+      url: config.BASE_URL + '/artist?id=' + id,
       method: 'GET',
       headers: {'User-Agent': 'Mozilla/5.0'}
     },(err, res, body) => {
       if(err) {
         rejected(err)
       }
-      let artists = [];
+      let artistDetail = { id }
       let $ = cheerio.load(body);
-      $('div.m-sgerlist ul li').each((idx, element) => {
-        let $element = $(element);
-        artists.push({
-          img: $element.find('img').attr('src'),
-          id: $element.find('a.nm').attr('href').match(/\d+/g)[0],
-          artist: $element.find('a.nm').text(),
-          homeId: $element.find('a.f-tdn').attr('href').match(/\d+/g)[0]
-        })
-      })
-      resolved(artists)
+      artistDetail.image = $('.n-artist img').attr('src')
+      artistDetail.name = $('#artist-name').text()
+      artistDetail.alias = $('#artist-alias').text()
+      artistDetail.homeId = $('a#artist-home').attr('href').match(/\d+/g)[0]
+      artistDetail.hotSong = JSON.parse($('#song-list-pre-data').text())
+      resolved(artistDetail)
     })
   })
 }
